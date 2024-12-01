@@ -1,0 +1,74 @@
+- name : catalogue
+  hosts: catalogue
+  become: yes
+  tasks:
+  - name: node js disable existing 
+    ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
+
+  - name: node js 18 install
+    ansible.builtin.dnf:
+      name: nodejs
+      state: present
+
+  - name: enable and start nodejs
+    ansible.builtin.service:
+      name: nodejs
+      status: started
+      enabled: yes
+
+  - name: create user
+    ansible.builtin.user:
+      name: roboshop
+
+  - name: remove any app directory 
+    ansible.builtin.file:
+      name: /app
+      state: absent
+
+  - name: create app directory
+    ansible.builtin.file:
+      name: /app
+      state: directory
+
+  - name: copy catalogue related files
+    ansible.builtin.get_url:
+      url:  https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+      dest: /temp
+
+  - name: unzip
+    ansible.builtin.unarchive:
+      src: /temp/catalogue.zip
+      dest: /app
+      remote_src: yes
+
+  - name: install npm
+    ansible.builtin.command: npm install
+    args:
+      chdir: /app
+
+  - name: systemd changes catalogue service
+    ansible.builtin.copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+
+  - name: systemd reload
+    ansible.builtin.systemd_service:
+      daemon_reload: true
+
+  - name: mongod repo
+    ansible.builtin.copy:
+      src: mongodb.repo
+      dest: /etc/yum.repos.d/mongodb.repo
+
+  - name: mongod installation
+    ansible.builtin.package:
+      name: mongodb-org-shell
+      state: present
+
+  # - name: enable
+  #   ansible.built.service:
+  #     name: mongod
+  #     status: started
+  #     enabled: yes
+
+  # - name: load schema
