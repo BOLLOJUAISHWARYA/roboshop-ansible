@@ -85,15 +85,41 @@
       state: restarted
       enabled: yes
 
-  - name: Debug if file is missing
-    debug:
-      msg: "The file /app/schema/db/schema.sql does not exist!"
-    when: not schema_file.stat.exists
+- name: Check permissions on file or directory
+  hosts: shipping.roboshop.store
+  become: true
+  tasks:
 
-  - name: Debug directory contents
-    command: ls -l /app/schema/db
-    register: ls_output
+    # Step 1: Check directory permissions
+    - name: Check permissions of /app/schema/db
+      stat:
+        path: /app/schema/db
+      register: dir_stat
 
-  - name: Output directory contents
-    debug:
-      var: ls_output.stdout_lines
+    # Step 2: Output directory permission details
+    - name: Debug directory permissions
+      debug:
+        msg: >
+          Directory /app/schema/db permissions: 
+          exists={{ dir_stat.stat.exists }} 
+          mode={{ dir_stat.stat.mode }} 
+          owner={{ dir_stat.stat.uid }} 
+          group={{ dir_stat.stat.gid }}
+
+    # Step 3: Check file permissions (if directory exists)
+    - name: Check permissions of schema.sql
+      stat:
+        path: /app/schema/db/schema.sql
+      register: file_stat
+      when: dir_stat.stat.exists
+
+    # Step 4: Output file permission details
+    - name: Debug file permissions
+      debug:
+        msg: >
+          File /app/schema/db/schema.sql permissions: 
+          exists={{ file_stat.stat.exists }} 
+          mode={{ file_stat.stat.mode }} 
+          owner={{ file_stat.stat.uid }} 
+          group={{ file_stat.stat.gid }}
+      when: dir_stat.stat.exists and file_stat.stat.exists
