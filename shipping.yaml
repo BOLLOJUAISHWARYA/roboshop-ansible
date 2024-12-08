@@ -65,3 +65,8 @@
   - name: print ouput
     ansible.builtin.debug:
       msg: "schema output: {{schema}}"
+
+  - name: load cities
+    ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} </app/schema/shipping.sql
+    when: schema.stdout == "0"
+    
