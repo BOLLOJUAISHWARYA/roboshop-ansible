@@ -25,7 +25,7 @@
 
   - name: url
     ansible.builtin.get_url:
-      url: https://roboshop-build.s3.amazonaws.com/shipping.zip
+      url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
       dest: /tmp
 
   - name: unarchive
