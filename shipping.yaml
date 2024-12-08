@@ -84,3 +84,8 @@
       name: shipping
       state: restarted
       enabled: yes
+
+  - name: Debug if file is missing
+    debug:
+      msg: "The file /app/schema/db/schema.sql does not exist!"
+    when: not schema_file.stat.exists
