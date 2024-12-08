@@ -89,3 +89,11 @@
     debug:
       msg: "The file /app/schema/db/schema.sql does not exist!"
     when: not schema_file.stat.exists
+
+  - name: Debug directory contents
+    command: ls -l /app/schema/db
+    register: ls_output
+
+  - name: Output directory contents
+    debug:
+      var: ls_output.stdout_lines
