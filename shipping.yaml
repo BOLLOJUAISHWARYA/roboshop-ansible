@@ -58,17 +58,22 @@
       name: mysql
       state: present
 
-  - name: check cities schema exists or not
-    ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'" 
-    register: schema
+  # - name: check cities schema exists or not
+  #   ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'" 
+  #   register: schema
 
-  - name: print ouput
-    ansible.builtin.debug:
-      msg: "schema output: {{schema}}"
+  # - name: print ouput
+  #   ansible.builtin.debug:
+  #     msg: "schema output: {{schema}}"
 
-  - name: load cities data
-    ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/schema/db/master-data.sql
-    when: schema.stdout != "1"
+  # - name: load cities data
+  #   ansible.builtin.command: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/schema/db/master-data.sql"
+  #   when: schema.stdout != "1"
+
+  - name: Check if schema.sql exists
+    stat:
+      path: /app/schema/db/schema.sql
+    register: schema_file
 
 
   - name: restart shipping
