@@ -29,7 +29,7 @@
       remote_src: yes
 
   - name: copy file reverse conf file
-    ansible.builtin.file:
+    ansible.builtin.copy:
       src: roboshop.conf
       dest: /etc/nginx/default.d/roboshop.conf
 
