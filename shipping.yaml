@@ -62,12 +62,16 @@
     ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'" 
     register: schema
 
-  - name: print ouput
-    ansible.builtin.debug:
-      msg: "schema output: {{schema}}"
+  # - name: print ouput
+  #   ansible.builtin.debug:
+  #     msg: "schema output: {{schema}}"
+  - name: sql
+    ansible.builtin.copy:
+      src: schema.sql
+      dest: /app
 
   - name: load cities data
-    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/schema/db/schema.sql"
+    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/schema.sql"
     when: schema.stdout != "1"
 
   - name: restart shipping
