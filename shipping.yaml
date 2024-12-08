@@ -76,7 +76,7 @@
     register: schema_file
 
   - name: Execute SQL if file exists
-    shell: mysql -h mysql.roboshop.store -uroot -pRoboshop@1 < /app/schema/db/schema.sql
+    shell: "mysql -h mysql.roboshop.store -uroot -pRoboshop@1 < /app/schema/db/schema.sql"
     when: schema_file.stat.exists
 
   - name: restart shipping
