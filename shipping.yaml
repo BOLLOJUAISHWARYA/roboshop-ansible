@@ -58,68 +58,20 @@
       name: mysql
       state: present
 
-  # - name: check cities schema exists or not
-  #   ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'" 
-  #   register: schema
+  - name: check cities schema exists or not
+    ansible.builtin.command: mysql -h mysql.roboshop.store -uroot -p{{mysql_password}} -sN -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'cities'" 
+    register: schema
 
-  # - name: print ouput
-  #   ansible.builtin.debug:
-  #     msg: "schema output: {{schema}}"
+  - name: print ouput
+    ansible.builtin.debug:
+      msg: "schema output: {{schema}}"
 
   # - name: load cities data
   #   ansible.builtin.command: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/schema/db/master-data.sql"
   #   when: schema.stdout != "1"
-
-  - name: Check if schema.sql exists
-    stat:
-      path: /app/schema/db/schema.sql
-    register: schema_file
-
-  - name: Execute SQL if file exists
-    shell: "mysql -h mysql.roboshop.store -uroot -pRoboshop@1 < /app/schema/db/schema.sql"
-    when: schema_file.stat.exists
 
   - name: restart shipping
     ansible.builtin.service:
       name: shipping
       state: restarted
       enabled: yes
-
-- name: Check permissions on file or directory
-  hosts: shipping.roboshop.store
-  become: true
-  tasks:
-
-    # Step 1: Check directory permissions
-    - name: Check permissions of /app/schema/db
-      stat:
-        path: /app/schema/db
-      register: dir_stat
-
-    # Step 2: Output directory permission details
-    - name: Debug directory permissions
-      debug:
-        msg: >
-          Directory /app/schema/db permissions: 
-          exists={{ dir_stat.stat.exists }} 
-          mode={{ dir_stat.stat.mode }} 
-          owner={{ dir_stat.stat.uid }} 
-          group={{ dir_stat.stat.gid }}
-
-    # Step 3: Check file permissions (if directory exists)
-    - name: Check permissions of schema.sql
-      stat:
-        path: /app/schema/db/schema.sql
-      register: file_stat
-      when: dir_stat.stat.exists
-
-    # Step 4: Output file permission details
-    - name: Debug file permissions
-      debug:
-        msg: >
-          File /app/schema/db/schema.sql permissions: 
-          exists={{ file_stat.stat.exists }} 
-          mode={{ file_stat.stat.mode }} 
-          owner={{ file_stat.stat.uid }} 
-          group={{ file_stat.stat.gid }}
-      when: dir_stat.stat.exists and file_stat.stat.exists
