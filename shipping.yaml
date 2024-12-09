@@ -67,8 +67,15 @@
   #     msg: "schema output: {{schema}}"
 
   - name: load cities data
-    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/db/master-data.sql"
+    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/db/schema.sql"
     when: schema.stdout != "1"
+
+  - name: load cities data
+    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/db/app-user.sql"
+ 
+  - name: load cities data
+    ansible.builtin.shell: "mysql -h mysql.roboshop.store -uroot -p{{mysql_password}}  < /app/db/master-data.sql"
+    
 
   - name: restart shipping
     ansible.builtin.service:
